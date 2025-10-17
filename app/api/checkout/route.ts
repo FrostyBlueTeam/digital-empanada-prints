@@ -1,26 +1,27 @@
+// app/api/checkout/route.ts
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 export async function POST(req: Request) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string); // no apiVersion
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
     const { quantity, flavor } = await req.json();
 
-    // derive origin from request headers (works on Netlify/Next)
-    const origin = new URL(req.headers.get('referer') || '').origin || process.env.NEXT_PUBLIC_BASE_URL || '';
+    // safest way to get the site origin in an API route
+    const { origin } = new URL(req.url);
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [
         {
-          // simple price_data for now ($5); you can swap to real Price IDs later
           price_data: {
             currency: 'usd',
             product_data: {
               name: `Digital Empanada Print — ${flavor}`,
-              description: `Never frozen, always digital.`,
+              description: 'Never frozen, always digital.',
             },
-            unit_amount: 500, // $5
+            unit_amount: 500,
           },
           quantity: quantity ?? 1,
         },
