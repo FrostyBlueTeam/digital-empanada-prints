@@ -10,11 +10,11 @@ export default function Home() {
 
   const handleCheckout = async (flavor: string) => {
     setLoading(true);
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity: 1, flavor }),
-    });
+    const res = await fetch(`${window.location.origin}/.netlify/functions/checkout`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ quantity: 1, flavor }),
+  });
 
     const data = await res.json();
     if (data.url) {
